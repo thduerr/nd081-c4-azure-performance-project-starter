@@ -24,7 +24,7 @@ from opencensus.trace.tracer import Tracer
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.ext.azure.trace_exporter import AzureExporter
 
-APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=0a6427fe-74e6-4c7e-986c-a222857c03bd"
+APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=bdaade00-9f7f-40af-b040-47111dab08e0"
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -124,6 +124,6 @@ def index():
 
 if __name__ == "__main__":
     # comment line below when deploying to VMSS
-    app.run()  # local
+    # app.run()  # local
     # uncomment the line below before deployment to VMSS
-    # app.run(host='0.0.0.0', threaded=True, debug=True) # remote
+    app.run(host='0.0.0.0', threaded=True, debug=True) # remote
