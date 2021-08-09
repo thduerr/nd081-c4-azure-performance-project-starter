@@ -4,7 +4,7 @@ user = udacityadmin
 analyticsworkspace = udacityworkspace
 autoscale = udacityas
 
-vmss:
+vmss-azure:
 	./setup-script.sh
 	az monitor log-analytics workspace create -g $(group) -n $(analyticsworkspace)
 	az monitor app-insights component create -a $(appinsight) -l westus2 -g $(group) --workspace $(analyticsworkspace)
@@ -12,20 +12,20 @@ vmss:
 	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU > 70 avg 5m" --scale out 3
 	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU < 30 avg 5m" --scale in 1
 
-vmss-deploy:
+vmss-instrumentationkey:
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
 	echo $(instrkey)
 	cat azure-vote/main.py | perl -pe "s/^(APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey)=.*\"/\1=$(instrkey)\"/g" > tmp; mv tmp azure-vote/main.py
 	cat azure-vote/main.py | perl -pe 's/^    (app\.run.+local)/    # \1/g' > tmp; mv tmp azure-vote/main.py
 	cat azure-vote/main.py | perl -pe 's/^    # (app\.run.+remote)/    \1/g' > tmp; mv tmp azure-vote/main.py
 
-vmss-deploy-2:
+vmss-git:
 	git checkout Deploy_to_VMSS
 	git add .
 	git ci -m "update instrumentation key"
 	git push
 
-vmss-deploy-3:
+vmss: vmss-azure vmss-instrumentationkey vmss-git
 	$(eval instances = $(shell az vmss list-instance-connection-info -g $(group) -n udacity-vmss -o tsv))
 	for instance in $(instances); do \
 		ssh -o StrictHostKeyChecking=no $(user)@$${instance%%:*} -p $${instance##*:} 'bash -s' < deploy-vote-app.sh; \

@@ -10,5 +10,4 @@ sudo apt install redis-server
 sudo apt install python3.7 -y
 python3 -m pip install -r requirements.txt
 cd azure-vote
-export FLASK_APP=main
-nohup flask run &
+FLASK_APP=main flask run 2>&1 &
