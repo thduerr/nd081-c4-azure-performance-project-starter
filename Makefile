@@ -1,18 +1,35 @@
 appinsight = udacity-app-insights
-user=udacityadmin
+group = acdnd-c4-project
+user = udacityadmin
+analyticsworkspace = udacityworkspace
+autoscale = udacityas
 
-setup:
+vmss:
 	./setup-script.sh
-	az monitor app-insights component create -a $(appinsight) -l westus2 -g acdnd-c4-project
-	$(eval instr_key = $(shell az monitor app-insights component show -a $(appinsight) -g acdnd-c4-project --query 'instrumentationKey' -o tsv))
-	@cat azure-vote/main.py | perl -pe "s/(^APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey=).*\"/\1$(instr_key)\"/g" > tmp; mv tmp azure-vote/main.py
+	az monitor log-analytics workspace create -g $(group) -n $(analyticsworkspace)
+	az monitor app-insights component create -a $(appinsight) -l westus2 -g $(group) --workspace $(analyticsworkspace)
+	$(eval instr_key = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
+	cat azure-vote/main.py \
+	| perl -pe "s/^(APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey=).*\"/\1$(instr_key)\"/g" \
+	| perl -pe 's/^    (app\.run.+local)/    # \1/g' \
+	| perl -pe 's/^    # (app\.run.+remote)/    \1/g' \
+	> tmp; mv tmp azure-vote/main.py
+	git checkout Deploy_to_VMSS
+	git add azure-vote/main.py
+	git ci -m "update instrumentation key"
+	git push
+	$(eval instances = $(shell az vmss list-instance-connection-info -g $(group) -n udacity-vmss -o tsv))
+	for instance in $(instances); do \
+		ssh -o StrictHostKeyChecking=no $(user)@$${instance%%:*} -p $${instance##*:} 'bash -s' < deploy-vote-app.sh; \
+	done
+	az monitor autoscale create -g $(group) -n $(autoscale) --resource udacity-vmss --min-count 2 --max-count 10 --count 2 --resource-type Microsoft.Compute/virtualMachineScaleSets
+	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU > 70 avg 5m" --scale out 3
+	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU < 30 avg 5m" --scale in 1
 
-deploy:
-	$(eval insts = $(shell az vmss list-instance-connection-info -g acdnd-c4-project -n udacity-vmss -o tsv))
-	for i in $(insts); do ssh -o StrictHostKeyChecking=no $(user)@$(shell awk -F':' '{print $$1}' <<< $(i)) -p $(shell awk -F':' '{print $$2}' <<< $(i)) 'bash -s' < deploy-vote-app.sh; done;
+clean:
+	$(eval groups = $(shell az group list --query '[].name' -o tsv))
+	@for group in $(groups); do \
+		echo deleting group $${group}; \
+		az group delete -n $${group} -y; \
+	done
 
-deploy2:
-	$(eval instance1 = $(shell az vmss list-instance-connection-info -g acdnd-c4-project -n udacity-vmss -o json | jq -r '."instance 1"'))
-	$(eval ip1 = $(shell awk -F':' '{print $$1}' <<< $(instance1)))
-	$(eval port1 = $(shell awk -F':' '{print $$2}' <<< $(instance1)))
-	ssh -o StrictHostKeyChecking=no udacityadmin@$(ip1) -p $(port1) 'bash -s' < deploy-vote-app.sh

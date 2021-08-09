@@ -7,7 +7,8 @@ git checkout Deploy_to_VMSS
 
 sudo apt update
 sudo apt install redis-server
-#redis-server
 sudo apt install python3.7 -y
 python3 -m pip install -r requirements.txt
-(cd azure-vote; python3 main.py)
+cd azure-vote
+export FLASK_APP=main
+nohup flask run &
