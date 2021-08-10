@@ -5,6 +5,7 @@ autoscale = udacityas
 
 vmss:
 	./setup-script.sh
+	az monitor app-insights component create -g $(group) -l westus2 -a $(app-insights)
 
 update-instrumentationkey:
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
