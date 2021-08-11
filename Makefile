@@ -2,10 +2,14 @@ appinsight = udacity-app-insights
 group = acdnd-c4-project
 user = udacityadmin
 autoscale = udacityas
+workspace = udacityworkspace
+random := $(shell bash -c 'echo $$RANDOM')
 
 vmss:
 	./setup-script.sh
-	az monitor app-insights component create -g $(group) -l westus2 -a $(app-insights)
+	az monitor log-analytics workspace create -g $(group) -n $(workspace)$(random)
+	az monitor app-insights component create -g $(group) -l westus2 -a $(appinsight) --workspace $(workspace)$(random)
+	@echo "ENABLE VM-INSIGHTS IN THE AZURE PORTAL"
 
 update-instrumentationkey:
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))

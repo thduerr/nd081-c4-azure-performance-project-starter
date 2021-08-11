@@ -4,7 +4,7 @@
 resourceGroup="acdnd-c4-project"
 location="westus2"
 osType="UbuntuLTS"
-vmssName="udacity-vmss"
+vmssName="udacity-vmss$RANDOM"
 adminName="udacityadmin"
 storageAccount="udacitydiag$RANDOM"
 bePoolName="$vmssName-bepool"
@@ -66,7 +66,7 @@ az vmss create \
   --upgrade-policy-mode automatic \
   --admin-username $adminName \
   --generate-ssh-keys \
-  --verbose 
+  --verbose
 
 echo "VM scale set created: $vmssName"
 
