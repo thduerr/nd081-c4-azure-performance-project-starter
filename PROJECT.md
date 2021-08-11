@@ -10,7 +10,8 @@ The project setup is based on a Makefile and several shell- and init-scripts
 
 ## Step 2: Application Insights & Log Analytics
 
-In the Azure portal, enable VM Insights monitoring for the VM Scale Set.
+In the Azure portal, enable VM Insights monitoring for the VM Scale Set using the 
+created Analytics Workspace. This can take 5-10 minutes.
 
 
 ## Step 3: Deploy to VMSS
