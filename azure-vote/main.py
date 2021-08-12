@@ -23,7 +23,7 @@ from opencensus.trace.tracer import Tracer
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.ext.azure.trace_exporter import AzureExporter
 
-APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=56b9b4e2-964a-4e3b-8fe3-672f4acf2abe"
+APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=2a96864f-5ec9-4991-b433-7453fa08dd2a"
 
 # Event Logging
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ logger.setLevel(logging.INFO)
 exporter = metrics_exporter.new_metrics_exporter(enable_standard_metrics=True, connection_string=APPLICATION_INSIGHTS_INTRUMENTATION_KEY)
 
 # Tracing
-tracer = Tracer(exporter=AzureExporter(connection_string=APPLICATION_INSIGHTS_INTRUMENTATION_KEY), sampler=ProbabilitySampler(1.0))
+tracer = Tracer(exporter=AzureExporter(connection_string=APPLICATION_INSIGHTS_INTRUMENTATION_KEY), sampler=ProbabilitySampler(rate=1.0))
 
 
 app = Flask(__name__)
@@ -76,47 +76,46 @@ if not r.get(button2):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-
-    if request.method == "GET":
-
-        # Get current values
-        vote1 = r.get(button1).decode("utf-8")
-        tracer.span(name="Cats Vote")
-
-        vote2 = r.get(button2).decode("utf-8")
-        tracer.span(name="Dogs Vote")
-
-        # Return index with values
-        return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
-
-    elif request.method == "POST":
-
-        if request.form["vote"] == "reset":
-
-            # Empty table and return results
-            r.set(button1, 0)
-            r.set(button2, 0)
-            vote1 = r.get(button1).decode("utf-8")
-            vote2 = r.get(button2).decode("utf-8")
-            logger.info(f"reset votes")
-
-            return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
-
-        else:
-
-            # Insert vote result into DB
-            vote = request.form["vote"]
-            votes = r.incr(vote, 1)
-
-            properties = {"custom_dimensions": {f"{vote} votes": votes}}
-            logger.info(f"vote for {vote}", extra=properties)
+    with tracer.span(name="app") as span:
+        if request.method == "GET":
 
             # Get current values
-            vote1 = r.get(button1).decode("utf-8")
-            vote2 = r.get(button2).decode("utf-8")
+            with tracer.span(name="get vote") as span:
+                vote1 = r.get(button1).decode("utf-8")
+                vote2 = r.get(button2).decode("utf-8")
 
-            # Return results
+            # Return index with values
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
+
+        elif request.method == "POST":
+            if request.form["vote"] == "reset":
+
+                # Empty table and return results
+                with tracer.span(name="reset vote") as span:
+                    r.set(button1, 0)
+                    r.set(button2, 0)
+                    vote1 = r.get(button1).decode("utf-8")
+                    vote2 = r.get(button2).decode("utf-8")
+                    logger.info(f"reset votes")
+
+                return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
+
+            else:
+
+                with tracer.span(name="post vote") as span:
+                    # Insert vote result into DB
+                    vote = request.form["vote"]
+                    votes = r.incr(vote, 1)
+
+                    properties = {"custom_dimensions": {f"{vote} votes": votes}}
+                    logger.info(f"vote for {vote}", extra=properties)
+
+                    # Get current values
+                    vote1 = r.get(button1).decode("utf-8")
+                    vote2 = r.get(button2).decode("utf-8")
+
+                # Return results
+                return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
 
 
 if __name__ == "__main__":

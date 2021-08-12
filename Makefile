@@ -12,7 +12,7 @@ vmss:
 	@echo "ENABLE VM-INSIGHTS IN THE AZURE PORTAL"
 
 update-instrumentationkey:
-	$(eval vmssname = $(shell az vmss list -g acdnd-c4-project --query '[].name' -o tsv))
+	$(eval vmssname = $(shell az vmss list -g $(group) --query '[].name' -o tsv))
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
 	echo $(instrkey)
 	cat azure-vote/main.py | perl -pe "s/^(APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey)=.*\"/\1=$(instrkey)\"/g" > tmp; mv tmp azure-vote/main.py
