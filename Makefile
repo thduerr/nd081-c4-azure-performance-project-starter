@@ -32,6 +32,7 @@ deploy: update-instrumentationkey push-to-github
 	done
 
 vmss-autoscale:
+	$(eval vmssname = $(shell az vmss list -g $(group) --query '[].name' -o tsv))
 	az monitor autoscale create -g $(group) -n $(autoscale) --resource $(vmssname) --min-count 2 --max-count 10 --count 2 --resource-type Microsoft.Compute/virtualMachineScaleSets
 	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU > 70 avg 5m" --scale out 3
 	az monitor autoscale rule create -g $(group) --autoscale-name $(autoscale) --condition "Percentage CPU < 30 avg 5m" --scale in 1
@@ -39,7 +40,7 @@ vmss-autoscale:
 	for instance in $(instances); do \
 		ssh -o StrictHostKeyChecking=no $(user)@$${instance%%:*} -p $${instance##*:} 'bash -s' < create-vmss-load.sh; \
 	done
-	watch az vmss list-instances -g $(group) -n $(vmssname) -o table
+	watch -n 30 az vmss list-instances -g $(group) -n $(vmssname) -o table
 
 clean:
 	$(eval groups = $(shell az group list --query '[].name' -o tsv))
