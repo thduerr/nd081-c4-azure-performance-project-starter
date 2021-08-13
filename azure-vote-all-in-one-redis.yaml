@@ -47,7 +47,7 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-  minReadySeconds: 5 
+  minReadySeconds: 5
   template:
     metadata:
       labels:
@@ -58,7 +58,7 @@ spec:
       containers:
       - name: azure-vote-front
         #image: mcr.microsoft.com/azuredocs/azure-vote-front:v1
-        image: myacr202106.azurecr.io/azure-vote-front:v1
+        image: thomdacr.azurecr.io/azure-vote-front:v1
         ports:
         - containerPort: 80
         resources:

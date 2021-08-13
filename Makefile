@@ -3,6 +3,7 @@ group = acdnd-c4-project
 user = udacityadmin
 autoscale = udacityas
 workspace = udacityworkspace
+registry = thomdacr
 random := $(shell bash -c 'echo $$RANDOM')
 
 vmss:
@@ -41,6 +42,20 @@ vmss-autoscale:
 		ssh -o StrictHostKeyChecking=no $(user)@$${instance%%:*} -p $${instance##*:} 'bash -s' < create-vmss-load.sh; \
 	done
 	watch -n 30 az vmss list-instances -g $(group) -n $(vmssname) -o table
+
+aks:
+	./create-cluster.sh
+	az acr create -g $(group) -n $(registry) --sku Basic --admin-enabled true
+	az acr login -n $(registry)
+	docker build -t azure-vote-front ./azure-vote
+	docker tag azure-vote-front:v1 $(registry).azurecr.io/azure-vote-front:v1
+	docker push $(registry).azurecr.io/azure-vote-front:v1
+	az aks update -n udacity-cluster -g $(group) --attach-acr $(registry)
+	kubectl apply -f azure-vote-all-in-one-redis.yaml
+	kubectl get service azure-vote-front --watch
+
+aks-autoscale:
+	kubectl autoscale deployment azure-vote-front --cpu-percent=30 --min=1 --max=10
 
 clean:
 	$(eval groups = $(shell az group list --query '[].name' -o tsv))
