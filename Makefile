@@ -12,6 +12,7 @@ vmss:
 	@echo "ENABLE VM-INSIGHTS IN THE AZURE PORTAL"
 
 update-instrumentationkey:
+	git checkout Deploy_to_VMSS
 	$(eval vmssname = $(shell az vmss list -g $(group) --query '[].name' -o tsv))
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
 	echo $(instrkey)
@@ -20,7 +21,6 @@ update-instrumentationkey:
 	cat azure-vote/main.py | perl -pe 's/^    # (app\.run.+remote)/    \1/g' > tmp; mv tmp azure-vote/main.py
 
 push-to-github:
-	git checkout Deploy_to_VMSS
 	git add azure-vote/main.py
 	git ci -m "update instrumentation key"
 	git push
