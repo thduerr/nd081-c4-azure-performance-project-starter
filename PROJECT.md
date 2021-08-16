@@ -5,6 +5,7 @@ The project setup is based on a Makefile and several shell- and init-scripts
 
 ## Step 1: Create an Azure VMSS
 
+    git checkout Deploy_to_VMSS
     make vmss
 
 

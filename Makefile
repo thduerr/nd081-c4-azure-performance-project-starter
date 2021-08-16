@@ -21,6 +21,7 @@ update-instrumentationkey:
 	cat azure-vote/main.py | perl -pe 's/^    # (app\.run.+remote)/    \1/g' > tmp; mv tmp azure-vote/main.py
 
 push-to-github:
+	git checkout Deploy_to_VMSS
 	git add azure-vote/main.py
 	git ci -m "update instrumentation key"
 	git push
