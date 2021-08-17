@@ -70,9 +70,16 @@ or by internally calling using the service name:
 
 ## Step 7: Runbook
 
-"Setup an Azure Automation account and create a RunBook to automate the resolution of performance issues"
+Setup an Azure Automation account and create a runbook which remedies the problem "sales up a VMSS on high CPU load".
+Scaling is simulated using a powershell script which prints the statement "Scale up VMSS".
+The runbook is triggered by a action group with a Azure monitor rule "avg Percentage CPU > 20" based on data
+from VMSS metrics. Additionally, the action group does send an email.
 
-Scale up the VMs using Automation Runbooks aSVM metrics
+CPU load of the VMSS is simulated using `ab`.
+
+    git checkout Deploy_to_VMSS
+    make runbook
+    ab -c 70 -n 50000 https://<ip>/
 
 
 
