@@ -23,7 +23,7 @@ from opencensus.trace.tracer import Tracer
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.ext.azure.trace_exporter import AzureExporter
 
-APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=d4cc6d9e-5f81-466f-aedd-f8f56fba7676"
+APPLICATION_INSIGHTS_INTRUMENTATION_KEY = "InstrumentationKey=89b65c68-b117-40d1-adbe-44437e47050a"
 
 # Event Logging
 logger = logging.getLogger(__name__)
