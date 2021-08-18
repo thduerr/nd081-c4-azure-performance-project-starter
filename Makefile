@@ -55,7 +55,7 @@ runbook:
 	$(eval vmssname = $(shell az vmss list -g $(group) --query '[].name' -o tsv))
 	$(eval scope = $(shell az vmss show -g $(group) -n $(vmssname) --query id -o tsv))
 	az monitor metrics alert create -g $(group) -n $(alert) --action $(actiongroup) --scopes $(scope) --description "scale up vmss" --condition "avg Percentage CPU > 20" --window-size 1m
-	@echo "NOW, EXTEND IN TEH PORTAL THE ACTION GROUP $(actiongroup) WITH AN ACTION OF TYPE 'Automation Runbook' AND THE RUNBOOK $(runbook)"
+	@echo "NOW, EXTEND IN THE PORTAL THE ACTION GROUP $(actiongroup) OF THE VMSS WITH AN ACTION OF TYPE 'Automation Runbook' AND THE RUNBOOK $(runbook)"
 
 aks:
 	./create-cluster.sh

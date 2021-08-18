@@ -82,17 +82,25 @@ The metrics which show the load increasing, then decreasing once scaled up with 
 The alert configuration in Azure Monitor which shows the resource, condition, action group (this should
 include a reference to your Runbook), and alert rule details:
 
-* submission-screenshots/runbook/XXX
+* submission-screenshots/runbook/runbook-alert-action-group.png
+* submission-screenshots/runbook/runbook-alert-config-scope-conditions.png
+* submission-screenshots/runbook/runbook-alert-config-action-details.png
 
 
 The email you received from the alert when the Runbook was executed:
 
-* submission-screenshots/runbook/XXX
+* submission-screenshots/runbook/alert-email-runbook-top.png
+* submission-screenshots/runbook/alert-email-runbook-bottom.png
+* submission-screenshots/runbook/alert-email-runbook-resolved.png
 
 
 The summary of the alert which shows 'why did this alert fire?', timestamps, and the criterion in which it
 fired:
 
-* submission-screenshots/runbook/XXX
+* submission-screenshots/runbook/runbook-alert-overview.png
+* submission-screenshots/runbook/runbook-alert-summary.png
+* submission-screenshots/runbook/runbook-alert-history.png
+* submission-screenshots/runbook/runbook-output.png
+* submission-screenshots/runbook/runbook-all-logs.png
 
 

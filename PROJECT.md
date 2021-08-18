@@ -42,6 +42,8 @@ The two autoscale rules are based on metrics:
 
 We trigger some load for 10 minutes (see 'create-vmss-load.sh' script) on both instances.
 
+Finally set the VMSS Scaling configuration to "manual Scale"
+
 
 ## Step 5: Deploy to AKS
 
