@@ -54,22 +54,25 @@ The email you received from the alert when the pod count increased:
 
 The conditions for which autoscaling will be triggered:
 
-* submission-screenshots/autoscaling-vmss/XXX
+* submission-screenshots/autoscaling-vmss/autoscaling-conditions-trigger.png
 
 
 The Activity log of the VM scale set which shows that it scaled up with timestamp:
 
-* submission-screenshots/autoscaling-vmss/XXX
+* submission-screenshots/autoscaling-vmss/vmss-activity-log.png
 
 
 The new instances being created:
 
-* submission-screenshots/autoscaling-vmss/XXX
+* submission-screenshots/autoscaling-vmss/vmss-new-instances-1.png
+* submission-screenshots/autoscaling-vmss/vmss-new-instances-2.png
+* submission-screenshots/autoscaling-vmss/vmss-new-instances-3.png
 
 
 The metrics which show the load increasing, then decreasing once scaled up with timestamp:
 
-* submission-screenshots/autoscaling-vmss/XXX
+* submission-screenshots/autoscaling-vmss/vmss-load-cpu-memory.png
+* submission-screenshots/autoscaling-vmss/vmss-load-byte-rates.png
 
 
 # 5. Screenshots for the Azure Runbook
