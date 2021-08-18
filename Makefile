@@ -18,7 +18,7 @@ vmss:
 	az monitor app-insights component create -g $(group) -l westus2 -a $(appinsight) --workspace $(workspace)$(random)
 	@echo "ENABLE VM-INSIGHTS IN THE AZURE PORTAL USING WORKSPACE $(workspace)$(random)"
 
-update-instrumentationkey:
+deploy:
 	git checkout Deploy_to_VMSS
 	$(eval vmssname = $(shell az vmss list -g $(group) --query '[].name' -o tsv))
 	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
@@ -26,14 +26,9 @@ update-instrumentationkey:
 	cat azure-vote/main.py | perl -pe "s/^(APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey)=.*\"/\1=$(instrkey)\"/g" > tmp; mv tmp azure-vote/main.py
 	cat azure-vote/main.py | perl -pe 's/^    (app\.run.+local)/    # \1/g' > tmp; mv tmp azure-vote/main.py
 	cat azure-vote/main.py | perl -pe 's/^    # (app\.run.+remote)/    \1/g' > tmp; mv tmp azure-vote/main.py
-
-push-to-github:
-	git checkout Deploy_to_VMSS
 	git add azure-vote/main.py
 	git ci -m "update instrumentation key"
 	git push
-
-deploy: update-instrumentationkey push-to-github
 	$(eval instances = $(shell az vmss list-instance-connection-info -g $(group) -n $(vmssname) -o tsv))
 	for instance in $(instances); do \
 		ssh -o StrictHostKeyChecking=no $(user)@$${instance%%:*} -p $${instance##*:} 'bash -s' < deploy-vote-app.sh; \
@@ -66,6 +61,13 @@ aks:
 	./create-cluster.sh
 	az acr create -g $(group) -n $(registry) --sku Basic --admin-enabled true
 	az acr login -n $(registry)
+	git checkout Deploy_to_AKS
+	$(eval instrkey = $(shell az monitor app-insights component show -a $(appinsight) -g $(group) --query 'instrumentationKey' -o tsv))
+	echo $(instrkey)
+	cat azure-vote/main.py | perl -pe "s/^(APPLICATION_INSIGHTS_INTRUMENTATION_KEY = \"InstrumentationKey)=.*\"/\1=$(instrkey)\"/g" > tmp; mv tmp azure-vote/main.py
+	git add azure-vote/main.py
+	git ci -m "update instrumentation key"
+	git push
 	docker build -t azure-vote-front ./azure-vote
 	docker tag azure-vote-front:v1 $(registry).azurecr.io/azure-vote-front:v1
 	docker push $(registry).azurecr.io/azure-vote-front:v1
