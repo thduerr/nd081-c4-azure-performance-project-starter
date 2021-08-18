@@ -8,6 +8,10 @@ both branches `Deploy_to_VMSS` and `Deploy_to_AKS`.
 
 # 2. Screenshots for the Application Insights
 
+* submission-screenshots/application-insights/resource-group.png
+* submission-screenshots/application-insights/resource-group-cluster.png
+
+
 The metrics from the VM Scale Set instance:
 
 * submission-screenshots/application-insights/vmss-insights-cpu-memory.png
@@ -43,6 +47,7 @@ The Application Insights metrics which show the increase in the number of pods:
 
 * submission-screenshots/kubernetes-cluster/cluster-insights.png
 * submission-screenshots/kubernetes-cluster/cluster-insights-container.png
+* submission-screenshots/kubernetes-cluster/cluster-metrics-podcount.png
 
 
 The email you received from the alert when the pod count increased:
@@ -78,6 +83,9 @@ The metrics which show the load increasing, then decreasing once scaled up with 
 
 
 # 5. Screenshots for the Azure Runbook
+
+* submission-screenshots/runbook/resource-group-runbook.png
+
 
 The alert configuration in Azure Monitor which shows the resource, condition, action group (this should
 include a reference to your Runbook), and alert rule details:
