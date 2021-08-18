@@ -36,17 +36,19 @@ The chart created from the output of the traces query:
 
 The output of the Horizontal Pod Autoscaler, showing an increase in the number of pods:
 
-* submission-screenshots/kubernetes-cluster/XXX
+* submission-screenshots/kubernetes-cluster/kubernetes-hpa.png
 
 
 The Application Insights metrics which show the increase in the number of pods:
 
-* submission-screenshots/kubernetes-cluster/XXX
+* submission-screenshots/kubernetes-cluster/cluster-insights.png
+* submission-screenshots/kubernetes-cluster/cluster-insights-container.png
 
 
 The email you received from the alert when the pod count increased:
 
-* submission-screenshots/kubernetes-cluster/XXX
+* submission-screenshots/kubernetes-cluster/email-pod-count-increase-top.png
+* submission-screenshots/kubernetes-cluster/email-pod-count-increase-bottom.png
 
 
 

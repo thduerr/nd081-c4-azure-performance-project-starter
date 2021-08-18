@@ -81,8 +81,9 @@ aks-autoscale:
 	$(eval scope = $(shell az aks show -g $(group) -n $(aksname) --query id -o tsv))
 	$(eval alertdimension = $(shell az monitor metrics alert dimension create -n "Kubernetes namespace" --op Include -v Default -o tsv))
 	$(eval alertcondition = $(shell az monitor metrics alert condition create -t static --aggregation "Average" --metric "podCount"  --op "GreaterThan" --threshold 3.0 --dimension $(alertdimension) -o tsv))
-	az monitor metrics alert create -n $(alert) -g $(group) --scopes $(scope) -a $(actiongroup) --condition $(alertcondition) --window-size 5m --evaluation-frequency 1m --description "POD Count"
+	az monitor metrics alert create -n $(alert) -g $(group) --scopes $(scope) -a $(actiongroup) --condition $(alertcondition) --window-size 1m --evaluation-frequency 1m --description "POD Count"
 	kubectl autoscale deployment azure-vote-front --cpu-percent=30 --min=1 --max=10
+	kubectl describe hpa azure-vote-front
 
 clean:
 	$(eval groups = $(shell az group list --query '[].name' -o tsv))
